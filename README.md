@@ -6,6 +6,7 @@
 App desenvolvido nas aulas do curso da [Rocketseat](https://www.rocketseat.com.br/) com alterações no layout feita com particularidades minhas.
 
 ## Layout
+![ignite-teams](https://user-images.githubusercontent.com/65584024/224461733-d5e7a6ae-96af-4ad3-82c7-c6c99a201ab8.png)
 
 # Tecnologias utilizadas
 - React Native
