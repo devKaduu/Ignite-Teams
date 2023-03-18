@@ -1,9 +1,9 @@
 import { Container, Icon, Title } from "./styles";
-import { TouchableOpacityProps } from 'react-native'
+import { TouchableOpacityProps } from "react-native";
 
 type Props = TouchableOpacityProps & {
   title: string;
-}
+};
 
 export function GroupCard({ title, ...rest }: Props) {
   return (
@@ -11,5 +11,5 @@ export function GroupCard({ title, ...rest }: Props) {
       <Icon />
       <Title>{title}</Title>
     </Container>
-  )
+  );
 }
