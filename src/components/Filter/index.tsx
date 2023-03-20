@@ -6,10 +6,10 @@ type Props = TouchableOpacityProps &
     title: string;
   };
 
-export function Filter() {
+export function Filter({ title, isActive = false, ...rest }: Props) {
   return (
-    <Container>
-      <Title></Title>
+    <Container {...rest} isActive={isActive}>
+      <Title>{title}</Title>
     </Container>
   );
 }

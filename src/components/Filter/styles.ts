@@ -5,12 +5,12 @@ export type FilterStyleProps = {
   isActive?: boolean;
 };
 
-export const Container = styled(TouchableOpacity)<FilterStyleProps>`
+export const Container = styled(TouchableOpacity) <FilterStyleProps>`
   ${({ theme, isActive }) =>
     isActive &&
     css`
-      border: 1px solid ${theme.COLORS.GRAY_700};
-    `}
+      border: 1px solid ${theme.COLORS.PINK_FIAP};
+`}
 
   border-radius: 4px;
   margin-right: 12px;
@@ -25,5 +25,6 @@ export const Title = styled.Text`
     font-family: ${theme.FONT_FAMILY.BOLD};
     font-size: ${theme.FONT_SIZE.SM}px;
     color: ${theme.COLORS.WHITE};
+    text-transform: uppercase;
   `}
 `;
