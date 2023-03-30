@@ -9,6 +9,7 @@ import { Container, Content, Icon } from "./styles";
 
 export function NewGroup() {
   const navigation = useNavigation();
+
   function handleNew() {
     navigation.navigate("players", { group: "Rocket" });
   }
