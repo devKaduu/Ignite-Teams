@@ -13,17 +13,48 @@ import { Filter } from "@components/Filter";
 import { PlayerCard } from "@components/PlayerCard";
 import { ListEmpty } from "@components/ListEmpty";
 import { Button } from "@components/Button";
+import { Alert } from "react-native";
+import { AppError } from "@utils/AppError";
+import { PlayerAddByGroup } from "@storage/player/playerAddByGroup";
+import { playerGetByGroup } from "@storage/player/playerGetByGroup";
 
 type RouteParams = {
   group: "";
 };
 
 export function Players() {
+  const [newPlayerName, setNewPlayerName] = useState("");
   const [team, setTeam] = useState("Time A");
   const [players, setPlayers] = useState([]);
 
   const route = useRoute();
   const { group } = route.params as RouteParams;
+
+  async function handleAddPlayer() {
+    if (newPlayerName.trim().length === 0) {
+      return Alert.alert(
+        "Nova Pessoa",
+        "Informe o nome da pessoa para adiconar"
+      );
+    }
+
+    const newPlayer = {
+      name: newPlayerName,
+      team,
+    };
+
+    try {
+      await PlayerAddByGroup(newPlayer, group);
+      const players = await playerGetByGroup(group);
+      console.log(players);
+    } catch (error) {
+      if (error instanceof AppError) {
+        return Alert.alert("Nova pessoa", error.message);
+      }
+      console.log(error);
+      Alert.alert("Nova Pessoa", "Nao foi possivel adicionar");
+    }
+  }
 
   return (
     <Container>
@@ -32,8 +63,12 @@ export function Players() {
       <Highlight title={group} subtitle="Adicione a galera e separe os times" />
 
       <Form>
-        <Input placeholder="Nome da pessoa" autoCorrect={false} />
-        <ButtonIcon icon="add" />
+        <Input
+          placeholder="Nome da pessoa"
+          autoCorrect={false}
+          onChangeText={setNewPlayerName}
+        />
+        <ButtonIcon icon="add" onPress={handleAddPlayer} />
       </Form>
 
       <HeaderList>
