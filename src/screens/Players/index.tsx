@@ -1,12 +1,11 @@
-import { useState, useEffect } from "react";
-import { FlatList, Alert } from "react-native";
+import { useState, useEffect, useRef } from "react";
+import { FlatList, Alert, TextInput } from "react-native";
 
 import { useRoute } from "@react-navigation/native";
 
 import { Container, Form, HeaderList, NumbersOfPlayers } from "./styles";
 
 import { PlayerAddByGroup } from "@storage/player/playerAddByGroup";
-import { playerGetByGroup } from "@storage/player/playerGetByGroup";
 import { PlayerGetByGroupAndTeam } from "@storage/player/playerGetByGroupAndTeam";
 import { PlayerStorageDTO } from "@storage/player/playerStorageDTO";
 import { AppError } from "@utils/AppError";
@@ -19,6 +18,7 @@ import { Filter } from "@components/Filter";
 import { PlayerCard } from "@components/PlayerCard";
 import { ListEmpty } from "@components/ListEmpty";
 import { Button } from "@components/Button";
+import { PlayerRemove } from "@storage/player/playerRemove";
 
 type RouteParams = {
   group: "";
@@ -31,6 +31,8 @@ export function Players() {
 
   const route = useRoute();
   const { group } = route.params as RouteParams;
+
+  const newPlayerNameInputRef = useRef<TextInput>(null);
 
   async function handleAddPlayer() {
     if (newPlayerName.trim().length === 0) {
@@ -47,6 +49,10 @@ export function Players() {
 
     try {
       await PlayerAddByGroup(newPlayer, group);
+
+      newPlayerNameInputRef.current?.blur();
+
+      setNewPlayerName("");
       fecthPlayersByTeam();
     } catch (error) {
       if (error instanceof AppError) {
@@ -82,9 +88,13 @@ export function Players() {
 
       <Form>
         <Input
+          inputRef={newPlayerNameInputRef}
           placeholder="Nome da pessoa"
           autoCorrect={false}
+          value={newPlayerName}
           onChangeText={setNewPlayerName}
+          onSubmitEditing={handleAddPlayer}
+          returnKeyType="done"
         />
         <ButtonIcon icon="add" onPress={handleAddPlayer} />
       </Form>
@@ -109,7 +119,10 @@ export function Players() {
         data={players}
         keyExtractor={(item) => item.name}
         renderItem={({ item }) => (
-          <PlayerCard name={item.name} onRemove={() => null} />
+          <PlayerCard
+            name={item.name}
+            onRemove={() => null}
+          />
         )}
         ListEmptyComponent={() => (
           <ListEmpty message="Não há pessoas nesse time." />
