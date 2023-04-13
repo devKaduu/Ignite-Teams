@@ -1,9 +1,15 @@
-import { useState } from "react";
-import { FlatList } from "react-native";
+import { useState, useEffect } from "react";
+import { FlatList, Alert } from "react-native";
 
 import { useRoute } from "@react-navigation/native";
 
 import { Container, Form, HeaderList, NumbersOfPlayers } from "./styles";
+
+import { PlayerAddByGroup } from "@storage/player/playerAddByGroup";
+import { playerGetByGroup } from "@storage/player/playerGetByGroup";
+import { PlayerGetByGroupAndTeam } from "@storage/player/playerGetByGroupAndTeam";
+import { PlayerStorageDTO } from "@storage/player/playerStorageDTO";
+import { AppError } from "@utils/AppError";
 
 import { Header } from "@components/Header";
 import { Highlight } from "@components/Highlight";
@@ -13,10 +19,6 @@ import { Filter } from "@components/Filter";
 import { PlayerCard } from "@components/PlayerCard";
 import { ListEmpty } from "@components/ListEmpty";
 import { Button } from "@components/Button";
-import { Alert } from "react-native";
-import { AppError } from "@utils/AppError";
-import { PlayerAddByGroup } from "@storage/player/playerAddByGroup";
-import { playerGetByGroup } from "@storage/player/playerGetByGroup";
 
 type RouteParams = {
   group: "";
@@ -25,7 +27,7 @@ type RouteParams = {
 export function Players() {
   const [newPlayerName, setNewPlayerName] = useState("");
   const [team, setTeam] = useState("Time A");
-  const [players, setPlayers] = useState([]);
+  const [players, setPlayers] = useState<PlayerStorageDTO[]>([]);
 
   const route = useRoute();
   const { group } = route.params as RouteParams;
@@ -45,8 +47,7 @@ export function Players() {
 
     try {
       await PlayerAddByGroup(newPlayer, group);
-      const players = await playerGetByGroup(group);
-      console.log(players);
+      fecthPlayersByTeam();
     } catch (error) {
       if (error instanceof AppError) {
         return Alert.alert("Nova pessoa", error.message);
@@ -55,6 +56,23 @@ export function Players() {
       Alert.alert("Nova Pessoa", "Nao foi possivel adicionar");
     }
   }
+
+  async function fecthPlayersByTeam() {
+    try {
+      const playerByTeam = await PlayerGetByGroupAndTeam(group, team);
+      setPlayers(playerByTeam);
+    } catch (error) {
+      console.log(error);
+      Alert.alert(
+        "Pessoas",
+        "Nao foi possivel carregar as pessoas do time selecionado."
+      );
+    }
+  }
+
+  useEffect(() => {
+    fecthPlayersByTeam();
+  }, [team]);
 
   return (
     <Container>
@@ -89,9 +107,9 @@ export function Players() {
 
       <FlatList
         data={players}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => item.name}
         renderItem={({ item }) => (
-          <PlayerCard name={item} onRemove={() => null} />
+          <PlayerCard name={item.name} onRemove={() => null} />
         )}
         ListEmptyComponent={() => (
           <ListEmpty message="Não há pessoas nesse time." />
